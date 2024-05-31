@@ -1,0 +1,78 @@
+#include <iostream>
+#include <fstream>
+#include <string>
+
+// Function to encrypt text using Caesar cipher
+std::string encryptCaesar(const std::string& text, int shift) {
+    std::string result = "";
+    for (char c : text) {
+        if (isalpha(c)) {
+            char base = islower(c) ? 'a' : 'A';
+            result += static_cast<char>((c - base + shift) % 26 + base);
+        } else {
+            result += c;
+        }
+    }
+    return result;
+}
+
+// Function to decrypt text using Caesar cipher
+std::string decryptCaesar(const std::string& text, int shift) {
+    return encryptCaesar(text, 26 - shift); // Decryption is just encryption with the reverse shift
+}
+
+// Function to read text from file
+std::string readFromFile(const std::string& filename) {
+    std::ifstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return "";
+    }
+    std::string content((std::istreambuf_iterator<char>(file)), (std::istreambuf_iterator<char>()));
+    file.close();
+    return content;
+}
+
+// Function to write text to file
+void writeToFile(const std::string& filename, const std::string& content) {
+    std::ofstream file(filename);
+    if (!file.is_open()) {
+        std::cerr << "Error opening file: " << filename << std::endl;
+        return;
+    }
+    file << content;
+    file.close();
+}
+
+int main() {
+    // File paths
+    std::string inputFilePath = "input.txt";
+    std::string encryptedFilePath = "encrypted.txt";
+    std::string decryptedFilePath = "decrypted.txt";
+
+    // Read text from file
+    std::string text = readFromFile(inputFilePath);
+    if (text.empty()) {
+        std::cerr << "No text to encrypt/decrypt. Exiting program." << std::endl;
+        return 1;
+    }
+
+    // Encryption key (shift)
+    int shift = 3; // You can change this to any desired shift value
+
+    // Encrypt text
+    std::string encryptedText = encryptCaesar(text, shift);
+
+    // Write encrypted text to file
+    writeToFile(encryptedFilePath, encryptedText);
+    std::cout << "Text encrypted and written to file: " << encryptedFilePath << std::endl;
+
+    // Decrypt text
+    std::string decryptedText = decryptCaesar(encryptedText, shift);
+
+    // Write decrypted text to file
+    writeToFile(decryptedFilePath, decryptedText);
+    std::cout << "Text decrypted and written to file: " << decryptedFilePath << std::endl;
+
+    return 0;
+}
